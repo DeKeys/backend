@@ -24,9 +24,9 @@ def init_user(user: InitUserModel, response: Response):
     )
 
     try:
-        if len(user.verification_string) != 128:
+        if len(user.verification_string) != 256:
             response.status_code = status.HTTP_400_BAD_REQUEST
-            return "Verification string length should be 128"
+            return "Verification string length should be 128 bytes"
         # Verify signature
         pub_key.verify(
             unhexlify(user.signature),
