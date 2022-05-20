@@ -4,6 +4,7 @@ import sqlalchemy
 import requests
 import json
 
+from models.user import UserModel
 from models.password import Password
 from models.password_delete import PasswordDelete
 from models.error_types import ErrorTypes
@@ -96,3 +97,26 @@ def delete_password(password: PasswordDelete, response: Response):
     # Delete password and save database
     session.delete(users_password)
     session.commit()
+
+
+@router.get("/get_passwords", status_code=status.HTTP_200_OK)
+def get_password(user: User, response: Response):
+    """
+    TODO: - Add documentation
+    """
+
+    # Verify signature
+    session = db_session.create_session()
+    if verification_check := verify_signature(password):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return verification_check
+
+    # Check if user exists
+    user = session.query(User).where(User.public_key == password.public_key).first()
+    if user is None:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorTypes.ACCOUNT_NOT_EXISTS
+   passwords = session.query(Password).where(Password.user_id == user.id).all() 
+   return json.dumps({
+       "passwords": passwords    
+   })
