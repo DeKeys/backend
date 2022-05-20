@@ -100,22 +100,24 @@ def delete_password(password: PasswordDelete, response: Response):
 
 
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
-def get_password(user: UserModel, response: Response):
+def get_passwords(user: UserModel, response: Response):
     """
     TODO: - Add documentation
     """
 
     # Verify signature
     session = db_session.create_session()
-    if verification_check := verify_signature(password):
+    if verification_check := verify_signature(user):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return verification_check
 
     # Check if user exists
-    user = session.query(User).where(User.public_key == password.public_key).first()
+    user = session.query(User).where(User.public_key == user.public_key).first()
     if user is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
+
+    # Get passwords from database
     passwords = session.query(Password).where(Password.user_id == user.id).all() 
     return json.dumps({
         "passwords": passwords    
