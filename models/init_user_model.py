@@ -1,7 +1,5 @@
-from pydantic import BaseModel
+from models.verification_model import VerificationModel
 
 
-class InitUserModel(BaseModel):
-    public_key: str
-    verification_string: str
-    signature: str
+class InitUserModel(VerificationModel):
+    pass
