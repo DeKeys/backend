@@ -118,7 +118,7 @@ def get_passwords(user: UserModel, response: Response):
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get passwords from database
-    passwords = session.query(Password).where(Password.user_id == user.id).all() 
+    passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all() 
     return json.dumps({
         "passwords": passwords    
     })
