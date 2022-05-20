@@ -1,9 +1,7 @@
-from models.verification_model import VerificationModel
-
+from models.verification import VerificationModel
 
 
 class Password(VerificationModel):
     service: str
     login: str
     password: str
-
