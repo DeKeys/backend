@@ -100,7 +100,7 @@ def delete_password(password: PasswordDelete, response: Response):
 
 
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
-def get_password(user: User, response: Response):
+def get_password(user: UserModel, response: Response):
     """
     TODO: - Add documentation
     """
