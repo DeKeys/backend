@@ -35,7 +35,7 @@ def add_password(password: Password, response: Response):
     }
 
     resp = requests.post("http://127.0.0.1:5001/api/v0/add", files={
-        sha512(password.service + password.login + password.password + password.public_key).hexdigest(): json.dumps(data)
+        sha512((password.service + password.login + password.password + password.public_key).encode("utf-8")).hexdigest(): json.dumps(data)
     })
     if resp.status_code != 200:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
