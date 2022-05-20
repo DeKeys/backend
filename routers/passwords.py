@@ -3,7 +3,7 @@ from models.password import Password
 from models.errors import ErrorTypes
 from data import db_session
 from data.users import User
-import data.passwords
+import data.passwords as dpasswords
 from routers.auth import verify_signature
 import requests
 import json
@@ -43,7 +43,7 @@ def add_password(password: Password, response: Response):
     addr = resp.json()["Hash"]
 
     # Add password to database
-    pwd = data.passwords.Password()
+    pwd = dpasswords.Password()
     pwd.user_id = user.id
     pwd.address = addr
     session.add(pwd)
