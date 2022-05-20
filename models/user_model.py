@@ -1,5 +1,5 @@
 from models.verification_model import VerificationModel
 
 
-class InitUserModel(VerificationModel):
+class UserModel(VerificationModel):
     pass
