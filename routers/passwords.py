@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Response, status
 from hashlib import sha512
+import sqlalchemy
 import requests
 import json
 
