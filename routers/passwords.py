@@ -116,7 +116,7 @@ def get_password(user: User, response: Response):
     if user is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
-   passwords = session.query(Password).where(Password.user_id == user.id).all() 
-   return json.dumps({
-       "passwords": passwords    
-   })
+    passwords = session.query(Password).where(Password.user_id == user.id).all() 
+    return json.dumps({
+        "passwords": passwords    
+    })
