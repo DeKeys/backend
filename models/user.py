@@ -1,4 +1,4 @@
-from models.verification_model import VerificationModel
+from models.verification import VerificationModel
 
 
 class UserModel(VerificationModel):
