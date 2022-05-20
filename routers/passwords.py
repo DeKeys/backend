@@ -1,20 +1,28 @@
 from fastapi import APIRouter, Response, status
-from models.password import Password
-from models.errors import ErrorTypes
-from data import db_session
-from data.users import User
-import data.passwords as dpasswords
-from routers.auth import verify_signature
+from hashlib import sha512
 import requests
 import json
-from hashlib import sha512
+
+from models.password import Password
+from models.password_delete import PasswordDelete
+from models.error_types import ErrorTypes
+
+from data import db_session
+from data.users import User
+import data.passwords as data_passwords
+
+from routers.auth import verify_signature
 
 
 router = APIRouter(prefix="/api")
 
 
-@router.post("/add_password", status_code=status.HTTP_200_OK)
-def add_password(password: Password, response: Response):
+@router.post("/create_password", status_code=status.HTTP_200_OK)
+def create_password(password: Password, response: Response):
+    """
+    TODO: - Add documentation
+    """
+
     # Verify signature
     session = db_session.create_session()
     if verification_check := verify_signature(password):
@@ -43,11 +51,47 @@ def add_password(password: Password, response: Response):
     addr = resp.json()["Hash"]
 
     # Add password to database
-    pwd = dpasswords.Password()
+    pwd = data_passwords.Password()
     pwd.user_id = user.id
     pwd.address = addr
     session.add(pwd)
     session.commit()
 
     return addr
-    
+
+
+# Password Deletion  
+@router.post("/delete_password", status_code=status.HTTP_200_OK)
+def delete_password(password: PasswordDelete, response: Response):
+    """
+    TODO: - Add documentation
+    """
+
+    # Verify signature
+    session = db_session.create_session()
+    if verification_check := verify_signature(password):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return verification_check
+
+    # Check if user exists
+    user = session.query(User).where(User.public_key == password.public_key).first()
+    if user is None:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorTypes.ACCOUNT_NOT_EXISTS
+
+    # Get password from database
+    users_password = session.query(data_passwords.Password).where(
+        sqlalchemy.and_(
+            data_passwords.Password.user_id == user.id, 
+            data_passwords.Password.address == password.address
+        )
+    ).first()
+
+    # Check if password exists
+    if not users_password:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorTypes.PASSWORD_NOT_EXIST
+
+    # Delete password and save database
+    session.delete(users_password)
+    session.commit()
