@@ -8,7 +8,7 @@ from data.users import User
 from data.passwords import Password
 from data import db_session
 from models.errors import ErrorTypes
-from models.init_user_model import InitUserModel
+from models.user import UserModel
 from binascii import unhexlify
 from typing import List
 
@@ -41,7 +41,7 @@ def verify_signature(model):
 
 
 @router.post("/init_user/", status_code=status.HTTP_200_OK)
-def init_user(user: InitUserModel, response: Response):
+def init_user(user: UserModel, response: Response):
     session = db_session.create_session()
 
     if verification_check := verify_signature(user):
