@@ -7,6 +7,7 @@ from fastapi import APIRouter, Response, status
 from data.users import User
 from data.passwords import Password
 from data import db_session
+from models.errors import ErrorTypes
 from models.init_user_model import InitUserModel
 from binascii import unhexlify
 from typing import List
@@ -23,7 +24,7 @@ def verify_signature(model):
     # Check verification string length
     if len(model.verification_string) != 256:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return "Verification string length should be 256"
+        return ErrorTypes.INVALID_VERIFICATION_STRING_LENGTH
     try:
         # Verify signature
         pub_key.verify(
@@ -35,20 +36,18 @@ def verify_signature(model):
             ),
             hashes.SHA512()
         )
-        return True
     except InvalidSignature:
-        return False
+        return ErrorTypes.INVALID_SIGNATURE 
 
 
 @router.post("/init_user/", status_code=status.HTTP_200_OK)
 def init_user(user: InitUserModel, response: Response):
     session = db_session.create_session()
-    verification_check = verify_signature(user)
 
-    if verification_check is False:
+    if verification_check := verify_signaeure(user):
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return "Invalid signature"
-        
+        return verification_check    
+
     # Find user in database
     if (db_user := session.query(User).where(User.public_key == user.public_key).first()) is None:
         # Create new user
