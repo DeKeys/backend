@@ -120,5 +120,5 @@ def get_passwords(user: UserModel, response: Response):
     # Get passwords from database
     passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all() 
     return json.dumps({
-        "passwords": passwords    
+        "passwords": list(map(lambda x: x.address, passwords)) 
     })
