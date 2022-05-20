@@ -44,7 +44,7 @@ def verify_signature(model):
 def init_user(user: InitUserModel, response: Response):
     session = db_session.create_session()
 
-    if verification_check := verify_signaeure(user):
+    if verification_check := verify_signature(user):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return verification_check    
 
