@@ -13,6 +13,8 @@ from data import db_session
 from data.users import User
 import data.passwords as data_passwords
 
+from constants import IPFS_URL
+
 from routers.auth import verify_signature
 
 
@@ -44,7 +46,7 @@ def create_password(password: Password, response: Response):
         "password": password.password
     }
 
-    resp = requests.post("http://127.0.0.1:5001/api/v0/add", files={
+    resp = requests.post(f"{IPFS_URL}/api/v0/add", files={
         sha512((password.service + password.login + password.password + password.public_key).encode("utf-8")).hexdigest(): json.dumps(data)
     })
     if resp.status_code != 200:
@@ -117,8 +119,16 @@ def get_passwords(user: UserModel, response: Response):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
-    # Get passwords from database
-    passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all() 
+    # Get passwords addresses from database
+    addresses = list(map(lambda x: x.address, session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all()))
+
+    # Retrieve passwords from IPFS
+    passwords = []
+    for addr in addresses:
+        response = requests.post(f"{IPFS_URL}/api/v0/cat/" + addr)
+        if response.status_code == 200:
+            passwords.append(response.json())
+
     return json.dumps({
-        "passwords": list(map(lambda x: x.address, passwords)) 
+        "passwords": passwords 
     })
