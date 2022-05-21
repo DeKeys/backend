@@ -120,7 +120,7 @@ def get_passwords(user: UserModel, response: Response):
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get passwords addresses from database
-    db_passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all()
+    db_passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).order_by(data_passwords.Password.created_at).all()
 
     # Retrieve passwords from IPFS
     passwords = []
