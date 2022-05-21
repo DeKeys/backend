@@ -125,7 +125,7 @@ def get_passwords(user: UserModel, response: Response):
     # Retrieve passwords from IPFS
     passwords = []
     for db_pwd in db_passwords:
-        response = requests.post(f"{IPFS_URL}/api/v0/cat/" + db_pwd.addr)
+        response = requests.post(f"{IPFS_URL}/api/v0/cat/" + db_pwd.address)
         if response.status_code == 200:
             data = response.json()
             data["created_at"] = str(db_pwd.created_at)
