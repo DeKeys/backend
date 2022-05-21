@@ -8,5 +8,5 @@ class Password(SqlAlchemyBase):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     address = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime())
+    created_at = Column(DateTime, default=datetime.datetime.now())
 
