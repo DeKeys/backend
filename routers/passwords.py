@@ -120,13 +120,15 @@ def get_passwords(user: UserModel, response: Response):
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get passwords addresses from database
-    addresses = list(map(lambda x: x.address, session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all()))
+    db_passwords = session.query(data_passwords.Password).where(data_passwords.Password.user_id == user.id).all()
 
     # Retrieve passwords from IPFS
     passwords = []
-    for addr in addresses:
-        response = requests.post(f"{IPFS_URL}/api/v0/cat/" + addr)
+    for db_pwd in db_passwords:
+        response = requests.post(f"{IPFS_URL}/api/v0/cat/" + db_pwd.addr)
         if response.status_code == 200:
+            data = response.json()
+            data["created_at"] = str(db_pwd.created_at)
             passwords.append(response.json())
 
     return json.dumps({
