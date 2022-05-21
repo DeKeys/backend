@@ -129,7 +129,7 @@ def get_passwords(user: UserModel, response: Response):
         if response.status_code == 200:
             data = response.json()
             data["created_at"] = str(db_pwd.created_at)
-            passwords.append(response.json())
+            passwords.append(data)
 
     return json.dumps({
         "passwords": passwords 
