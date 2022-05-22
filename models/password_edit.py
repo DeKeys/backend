@@ -8,5 +8,5 @@ class PasswordEdit(VerificationModel):
 
 	address: str
 	service: str
-    login: str
-    password: str
+	login: str
+	password: str
