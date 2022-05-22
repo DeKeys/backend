@@ -21,13 +21,13 @@ router = APIRouter(prefix="/api")
 
 def verify_signature(model):
     # Load public key
-    pub_key = serialization.load_pem_public_key(
-        unhexlify(model.public_key)
-    )
+    pub_key = serialization.load_pem_public_key(unhexlify(model.public_key))
+
     # Check verification string length
     if len(model.verification_string) != 256:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.INVALID_VERIFICATION_STRING_LENGTH
+    
     try:
         # Verify signature
         pub_key.verify(
