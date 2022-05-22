@@ -126,7 +126,7 @@ def get_passwords(model: UserModel, response: Response):
     })
 
 
-@router.get("/edit_password", status_code=status.HTTP_200_OK)
+@router.post("/edit_password", status_code=status.HTTP_200_OK)
 @verify_user
 def edit_password(password: PasswordEdit, response: Response):
     """
