@@ -1,12 +1,9 @@
-from models.verification import VerificationModel
+from models.password import Password 
 
 
-class PasswordEdit(VerificationModel):
+class PasswordEdit(Password):
 	"""
 	address - address of password in IPFS
 	"""
 
 	address: str
-	service: str
-	login: str
-	password: str
