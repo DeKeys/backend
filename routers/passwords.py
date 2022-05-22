@@ -38,7 +38,7 @@ def create_password(password: Password, response: Response):
         return verification_check
 
     # Check if user exists
-    if user := session.query(User).where(User.public_key == password.public_key).first() is None:
+    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
@@ -84,7 +84,7 @@ def delete_password(password: PasswordDelete, response: Response):
         return verification_check
 
     # Check if user exists
-    if user := session.query(User).where(User.public_key == password.public_key).first() is None:
+    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
@@ -120,7 +120,7 @@ def get_passwords(user: UserModel, response: Response):
         return verification_check
 
     # Check if user exists
-    if user := session.query(User).where(User.public_key == password.public_key).first() is None:
+    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
@@ -157,7 +157,7 @@ def edit_password(password: PasswordEdit, response: Response):
         return verification_check
 
     # Check if user exists
-    if user := session.query(User).where(User.public_key == password.public_key).first() is None:
+    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
