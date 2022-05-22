@@ -4,6 +4,7 @@ import sqlalchemy
 import requests
 import json
 import time
+import datetime
 
 from models.user import UserModel
 from models.password import Password
@@ -59,7 +60,7 @@ def create_password(password: Password, response: Response):
     pwd = data_passwords.Password()
     pwd.user_id = user.id
     pwd.address = addr
-    pwd.created_at = time.time()
+    pwd.created_at = datetime.now()
     session.add(pwd)
     session.commit()
 
@@ -129,7 +130,7 @@ def get_passwords(user: UserModel, response: Response):
         response = requests.post(f"{IPFS_URL}/api/v0/cat/" + db_pwd.address)
         if response.status_code == 200:
             data = response.json()
-            data["created_at"] = db_pwd.created_at
+            data["created_at"] = db_pwd.created_at.timestamp()
             data["address"] = db_pwd.address
             passwords.append(data)
 
