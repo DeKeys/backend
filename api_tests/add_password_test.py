@@ -13,8 +13,3 @@ class AddPasswordTests(unittest.TestCase):
         passwords_addresses = list(map(lambda x: x["address"], get_passwords(PUB_KEY_STRING, PRIVATE_KEY, SIGNATURE, DATA)))
         self.assertIn(address, passwords_addresses)
 
-    def test_ipfs_addition(self):
-        address = add_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, "test.service", "test.login", "test.password").strip('"')
-        resp = requests.get("https://ipfs.infura.io/ipfs/{}".format(address))
-        self.assertEqual(resp.status_code, 200)
-
