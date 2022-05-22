@@ -115,12 +115,12 @@ def get_passwords(user: UserModel, response: Response):
     session = db_session.create_session()
 
     # Verify signature
-    if verification_check := verify_signature(password):
+    if verification_check := verify_signature(user):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return verification_check
 
     # Check if user exists
-    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
+    if (user := session.query(User).where(User.public_key == user.public_key).first()) is None:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.ACCOUNT_NOT_EXISTS
 
