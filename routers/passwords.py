@@ -5,6 +5,7 @@ import requests
 import json
 import time
 from datetime import datetime
+from functools import wraps
 
 from models.user import UserModel
 from models.password import Password
@@ -24,7 +25,27 @@ from routers.auth import verify_signature
 router = APIRouter(prefix="/api")
 
 
+def user_verification(func):
+    @wraps(func)
+    def verify_user(model, response):
+        if verification_check := verify_signature(model) or\
+            (user := session.query(User).where(User.public_key == model.public_key).first()) is None:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return verification_check or ErrorTypes.ACCOUNT_NOT_EXISTS
+        func(model, response)
+        
+
+# def verify_user(model, response, func):
+#     err = None
+#     if verification_check := verify_signature(model) or\
+#         (user := session.query(User).where(User.public_key == model.public_key).first()) is None:
+#         response.status_code = status.HTTP_400_BAD_REQUEST
+#         err = verification_check or ErrorTypes.ACCOUNT_NOT_EXISTS
+#     return user, err
+
+
 @router.post("/create_password", status_code=status.HTTP_200_OK)
+@user_verification
 def create_password(password: Password, response: Response):
     """
     TODO: - Add documentation
@@ -71,6 +92,7 @@ def create_password(password: Password, response: Response):
 
 
 @router.post("/delete_password", status_code=status.HTTP_200_OK)
+@user_verification
 def delete_password(password: PasswordDelete, response: Response):
     """
     TODO: - Add documentation
@@ -107,6 +129,7 @@ def delete_password(password: PasswordDelete, response: Response):
 
 
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
+@user_verification
 def get_passwords(user: UserModel, response: Response):
     """
     TODO: - Add documentation
@@ -144,6 +167,7 @@ def get_passwords(user: UserModel, response: Response):
 
 
 @router.get("/edit_password", status_code=status.HTTP_200_OK)
+@user_verification
 def edit_password(password: PasswordEdit, response: Response):
     """
     TODO: - Add documentation
