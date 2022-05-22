@@ -129,6 +129,7 @@ def get_passwords(user: UserModel, response: Response):
         if response.status_code == 200:
             data = response.json()
             data["created_at"] = db_pwd.created_at.strftime("%d-%m-%Y %H:%M:%S")
+            data["address"] = db_pwd.address
             passwords.append(data)
 
     return json.dumps({
