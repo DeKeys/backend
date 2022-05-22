@@ -4,7 +4,7 @@ import sqlalchemy
 import requests
 import json
 import time
-import datetime
+from datetime import datetime
 
 from models.user import UserModel
 from models.password import Password
