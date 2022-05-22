@@ -58,13 +58,13 @@ def create_password(password: Password, response: Response):
     pwd = data_passwords.Password()
     pwd.user_id = user.id
     pwd.address = addr
+    pwd.created_at = time.time()
     session.add(pwd)
     session.commit()
 
     return addr
 
 
-# Password Deletion  
 @router.post("/delete_password", status_code=status.HTTP_200_OK)
 def delete_password(password: PasswordDelete, response: Response):
     """
@@ -128,7 +128,7 @@ def get_passwords(user: UserModel, response: Response):
         response = requests.post(f"{IPFS_URL}/api/v0/cat/" + db_pwd.address)
         if response.status_code == 200:
             data = response.json()
-            data["created_at"] = db_pwd.created_at.strftime("%d-%m-%Y %H:%M:%S")
+            data["created_at"] = db_pwd.created_at
             data["address"] = db_pwd.address
             passwords.append(data)
 
