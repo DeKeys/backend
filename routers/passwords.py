@@ -25,43 +25,27 @@ from routers.auth import verify_signature
 router = APIRouter(prefix="/api")
 
 
-def user_verification(func):
+def verify_user(func):
     @wraps(func)
-    def verify_user(model, response):
+    def verify(*args, **kwargs):
+        session = db_session.create_session()
+        model, response = kwargs.values()
         if verification_check := verify_signature(model) or\
             (user := session.query(User).where(User.public_key == model.public_key).first()) is None:
             response.status_code = status.HTTP_400_BAD_REQUEST
             return verification_check or ErrorTypes.ACCOUNT_NOT_EXISTS
-        func(model, response)
+        func.__globals__["session"] = session
+        func.__globals__["user"] = user
+        return func(model, response)
+    return verify
         
 
-# def verify_user(model, response, func):
-#     err = None
-#     if verification_check := verify_signature(model) or\
-#         (user := session.query(User).where(User.public_key == model.public_key).first()) is None:
-#         response.status_code = status.HTTP_400_BAD_REQUEST
-#         err = verification_check or ErrorTypes.ACCOUNT_NOT_EXISTS
-#     return user, err
-
-
 @router.post("/create_password", status_code=status.HTTP_200_OK)
-@user_verification
+@verify_user
 def create_password(password: Password, response: Response):
     """
     TODO: - Add documentation
     """
-
-    session = db_session.create_session()
-
-    # Verify signature
-    if verification_check := verify_signature(password):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return verification_check
-
-    # Check if user exists
-    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Add password to IPFS
     data = {
@@ -92,23 +76,11 @@ def create_password(password: Password, response: Response):
 
 
 @router.post("/delete_password", status_code=status.HTTP_200_OK)
-@user_verification
+@verify_user
 def delete_password(password: PasswordDelete, response: Response):
     """
     TODO: - Add documentation
     """
-
-    session = db_session.create_session()
-
-    # Verify signature
-    if verification_check := verify_signature(password):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return verification_check
-
-    # Check if user exists
-    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get password from database
     users_password = session.query(DataPassword).where(
@@ -129,23 +101,11 @@ def delete_password(password: PasswordDelete, response: Response):
 
 
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
-@user_verification
-def get_passwords(user: UserModel, response: Response):
+@verify_user
+def get_passwords(model: UserModel, response: Response):
     """
     TODO: - Add documentation
     """
-
-    session = db_session.create_session()
-
-    # Verify signature
-    if verification_check := verify_signature(user):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return verification_check
-
-    # Check if user exists
-    if (user := session.query(User).where(User.public_key == user.public_key).first()) is None:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get passwords addresses from database
     db_passwords = session.query(DataPassword).where(DataPassword.user_id == user.id).order_by(DataPassword.created_at.desc()).all()
@@ -167,23 +127,11 @@ def get_passwords(user: UserModel, response: Response):
 
 
 @router.get("/edit_password", status_code=status.HTTP_200_OK)
-@user_verification
+@verify_user
 def edit_password(password: PasswordEdit, response: Response):
     """
     TODO: - Add documentation
     """
-
-    session = db_session.create_session()
-
-    # Verify signature
-    if verification_check := verify_signature(password):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return verification_check
-
-    # Check if user exists
-    if (user := session.query(User).where(User.public_key == password.public_key).first()) is None:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorTypes.ACCOUNT_NOT_EXISTS
 
     # Get password from database
     password_to_edit = session.query(DataPassword).where(
