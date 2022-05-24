@@ -58,3 +58,4 @@ def init_user(user: UserModel, response: Response):
         new_user.public_key = user.public_key
         session.add(new_user)
         session.commit()
+    session.close()
