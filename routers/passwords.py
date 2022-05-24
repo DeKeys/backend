@@ -72,6 +72,8 @@ def create_password(password: Password, response: Response):
     session.add(pwd)
     session.commit()
 
+    session.close()
+
     return addr
 
 
@@ -99,6 +101,8 @@ def delete_password(password: PasswordDelete, response: Response):
     session.delete(users_password)
     session.commit()
 
+    session.close()
+
 
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
 @verify_user
@@ -120,6 +124,8 @@ def get_passwords(model: UserModel, response: Response):
             data["created_at"] = db_pwd.created_at.timestamp()
             data["address"] = db_pwd.address
             passwords.append(data)
+
+    session.close()
 
     return json.dumps({
         "passwords": passwords 
@@ -166,6 +172,8 @@ def edit_password(password: PasswordEdit, response: Response):
     # Edit password to database
     password_to_edit.address = new_address
     session.commit()
+
+    session.close()
 
     return new_address
 
