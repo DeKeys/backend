@@ -8,6 +8,8 @@ init_user(PUB_KEY_STRING, SIGNATURE, DATA)
 
 
 class AddPasswordTests(unittest.TestCase):
+    """Tests for creation of new passwords."""
+    
     def test_addition(self):
         address = add_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, "test.service", "test.login", "test.password").strip('"')
         passwords_addresses = list(map(lambda x: x["address"], get_passwords(PUB_KEY_STRING, PRIVATE_KEY, SIGNATURE, DATA)))

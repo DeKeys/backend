@@ -4,19 +4,23 @@ import requests
 import unittest
 
 
-# Create new user
 init_user(PUB_KEY_STRING, SIGNATURE, DATA)
 
 
 class EditPasswordsTest(unittest.TestCase):
-    # Check change of address in IPFS
+    """Tests for passwords edition."""
+
     def test_address_change(self):
+        """Check change of address in IPFS."""
+
         address_before = add_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, "test.service", "test.login", "test.password_before").strip('"')
         address_after = edit_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, address_before, "test.service", "test.login", "test.password_after").strip('"')
+        
         self.assertNotEqual(address_before, address_after)
 
-    # Check that password is actually different
     def test_password_change(self):
+        """Check that password is actually different."""
+
         address_before = add_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, "test.service", "test.login", "test.password_before").strip('"')
         password_before = requests.get("https://ipfs.infura.io/ipfs/{}".format(address_before)).json()["password"]
 

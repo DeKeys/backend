@@ -8,11 +8,18 @@ init_user(PUB_KEY_STRING, SIGNATURE, DATA)
 
 
 class GetPasswordsTest(unittest.TestCase):
+    """Tests for passwords fetching."""
+
     def test_password_decryption(self):
+        """Test passwords decryption."""
+
         self.assertRaises(Exception, get_passwords(PUB_KEY_STRING, PRIVATE_KEY, SIGNATURE, DATA))
         
     def test_addresses(self):
+        """Tests for appropriate IPFS addresses."""
+
         passwords = get_passwords(PUB_KEY_STRING, PRIVATE_KEY, SIGNATURE, DATA)
+
         for pwd in passwords:
             resp = requests.get("https://ipfs.infura.io/ipfs/{}".format(pwd["address"]))
             self.assertEqual(resp.status_code, 200)

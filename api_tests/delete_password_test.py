@@ -4,11 +4,12 @@ import requests
 import unittest
 
 
-# Create new user
 init_user(PUB_KEY_STRING, SIGNATURE, DATA)
 
 
 class DeletePasswordsTest(unittest.TestCase):
+    """Tests for passwords deletion."""
+
     def test_passwords_count(self):
         address = add_password(PUBLIC_KEY, PUB_KEY_STRING, SIGNATURE, DATA, "test.service", "test.login", "test.password").strip('"')
         passwords_count_before = len(get_passwords(PUB_KEY_STRING, PRIVATE_KEY, SIGNATURE, DATA))
