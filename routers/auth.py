@@ -54,6 +54,9 @@ def init_user(user: UserModel, response: Response):
 
     Created DB session and then check if user already exists. 
     If not, creates new one.
+
+    :param user: instance of a user
+    :param response: some response
     """
 
     session = db_session.create_session()
