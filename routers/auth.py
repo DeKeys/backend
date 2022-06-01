@@ -24,6 +24,8 @@ def verify_signature(model):
 
     Firstly, get the public key and then check wether it's correct or not.
     Then verifying this public key by provided signature.
+
+    :param model: model is a verification model
     """
 
     pub_key = serialization.load_pem_public_key(unhexlify(model.public_key))
