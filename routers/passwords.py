@@ -26,28 +26,40 @@ router = APIRouter(prefix="/api")
 
 
 def verify_user(func):
+    """User verification wrapper."""
+
     @wraps(func)
     def verify(*args, **kwargs):
+        """User verification function.
+
+        Creates new session. Then checks that user if valid by data in BD.
+        """
+
         session = db_session.create_session()
         model, response = kwargs.values()
+
         if verification_check := verify_signature(model) or\
             (user := session.query(User).where(User.public_key == model.public_key).first()) is None:
             response.status_code = status.HTTP_400_BAD_REQUEST
             return verification_check or ErrorTypes.ACCOUNT_NOT_EXISTS
+        
         func.__globals__["session"] = session
         func.__globals__["user"] = user
+
         return func(model, response)
+
     return verify
         
 
 @router.post("/create_password", status_code=status.HTTP_200_OK)
 @verify_user
 def create_password(password: Password, response: Response):
-    """
-    TODO: - Add documentation
+    """Password creation function.
+    
+    Creates data dictionary with new password. Add this new password to IPFS.
+    Get info of that data in IPFS and fill the DB with this data.
     """
 
-    # Add password to IPFS
     data = {
         "service": password.service,
         "login": password.login,
@@ -64,7 +76,6 @@ def create_password(password: Password, response: Response):
         
     addr = resp.json()["Hash"]
 
-    # Add password to database
     pwd = DataPassword()
     pwd.user_id = user.id
     pwd.address = addr
@@ -80,11 +91,12 @@ def create_password(password: Password, response: Response):
 @router.post("/delete_password", status_code=status.HTTP_200_OK)
 @verify_user
 def delete_password(password: PasswordDelete, response: Response):
-    """
-    TODO: - Add documentation
+    """Password deletion function.
+    
+    Get password from DB by user id and address of a password and check if password exist in DB.
+    Then simply delete password from DB.
     """
 
-    # Get password from database
     users_password = session.query(DataPassword).where(
         sqlalchemy.and_(
             DataPassword.user_id == user.id, 
@@ -92,12 +104,10 @@ def delete_password(password: PasswordDelete, response: Response):
         )
     ).first()
 
-    # Check if password exists
     if not users_password:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.PASSWORD_NOT_EXIST
 
-    # Delete password and save database
     session.delete(users_password)
     session.commit()
 
@@ -107,14 +117,13 @@ def delete_password(password: PasswordDelete, response: Response):
 @router.get("/get_passwords", status_code=status.HTTP_200_OK)
 @verify_user
 def get_passwords(model: UserModel, response: Response):
-    """
-    TODO: - Add documentation
+    """Password fetching function.
+
+    Fetch password from DB and reciece it's data from IPFS.
     """
 
-    # Get passwords addresses from database
     db_passwords = session.query(DataPassword).where(DataPassword.user_id == user.id).order_by(DataPassword.created_at.desc()).all()
 
-    # Retrieve passwords from IPFS
     passwords = []
 
     for db_pwd in db_passwords:
@@ -135,11 +144,14 @@ def get_passwords(model: UserModel, response: Response):
 @router.post("/edit_password", status_code=status.HTTP_200_OK)
 @verify_user
 def edit_password(password: PasswordEdit, response: Response):
-    """
-    TODO: - Add documentation
+    """Password editing function.
+    
+    Fetch passowrd's information from DB and check that it exists.
+    Then create dictionary with data of a new version of a password.
+    After that upload password to IPFS. Using data we got from uploading on IPFS,
+    update information in DB.
     """
 
-    # Get password from database
     password_to_edit = session.query(DataPassword).where(
         sqlalchemy.and_(
             DataPassword.user_id == user.id, 
@@ -147,12 +159,10 @@ def edit_password(password: PasswordEdit, response: Response):
         )
     ).first()
 
-    # Check if password exists
     if not password_to_edit:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.PASSWORD_NOT_EXIST
 
-    # Add password to IPFS
     data = {
         "service": password.service,
         "login": password.login,
@@ -169,7 +179,6 @@ def edit_password(password: PasswordEdit, response: Response):
 
     new_address = resp.json()["Hash"]
 
-    # Edit password to database
     password_to_edit.address = new_address
     session.commit()
 

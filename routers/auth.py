@@ -20,16 +20,19 @@ router = APIRouter(prefix="/api")
 
 
 def verify_signature(model):
-    # Load public key
+    """Signature verification function.
+
+    Firstly, get the public key and then check wether it's correct or not.
+    Then verifying this public key by provided signature.
+    """
+
     pub_key = serialization.load_pem_public_key(unhexlify(model.public_key))
 
-    # Check verification string length
     if len(model.verification_string) != 256:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorTypes.INVALID_VERIFICATION_STRING_LENGTH
     
     try:
-        # Verify signature
         pub_key.verify(
             unhexlify(model.signature),
             unhexlify(model.verification_string),
@@ -45,15 +48,19 @@ def verify_signature(model):
 
 @router.post("/init_user/", status_code=status.HTTP_200_OK)
 def init_user(user: UserModel, response: Response):
+    """User initialization.
+
+    Created DB session and then check if user already exists. 
+    If not, creates new one.
+    """
+
     session = db_session.create_session()
 
     if verification_check := verify_signature(user):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return verification_check    
 
-    # Find user in database
     if (db_user := session.query(User).where(User.public_key == user.public_key).first()) is None:
-        # Create new user
         new_user = User()
         new_user.public_key = user.public_key
         session.add(new_user)
