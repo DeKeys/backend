@@ -59,8 +59,8 @@ def create_password(password: Password, response: Response):
     Creates data dictionary with new password. Add this new password to IPFS.
     Get info of that data in IPFS and fill the DB with this data.
 
-    :param password: instance of a new password
-    :param response: some response
+    @param password: instance of a new password
+    @param response: some response
     """
 
     data = {
@@ -99,8 +99,8 @@ def delete_password(password: PasswordDelete, response: Response):
     Get password from DB by user id and address of a password and check if password exist in DB.
     Then simply delete password from DB.
 
-    :param password: instance of a password that needs to be deleted
-    :param response: some response
+    @param password: instance of a password that needs to be deleted
+    @param response: some response
     """
 
     users_password = session.query(DataPassword).where(
@@ -127,8 +127,8 @@ def get_passwords(model: UserModel, response: Response):
 
     Fetch password from DB and reciece it's data from IPFS.
 
-    :param model: instance of a user
-    :param response: some response
+    @param model: instance of a user
+    @param response: some response
     """
 
     db_passwords = session.query(DataPassword).where(DataPassword.user_id == user.id).order_by(DataPassword.created_at.desc()).all()
@@ -160,8 +160,8 @@ def edit_password(password: PasswordEdit, response: Response):
     After that upload password to IPFS. Using data we got from uploading on IPFS,
     update information in DB.
 
-    :param password: instance of a password that needs to be edited
-    :param response: some response
+    @param password: instance of a password that needs to be edited
+    @param response: some response
     """
 
     password_to_edit = session.query(DataPassword).where(

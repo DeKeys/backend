@@ -25,7 +25,7 @@ def verify_signature(model):
     Firstly, get the public key and then check wether it's correct or not.
     Then verifying this public key by provided signature.
 
-    :param model: model is a verification model
+    @param model: model is a verification model
     """
 
     pub_key = serialization.load_pem_public_key(unhexlify(model.public_key))
@@ -55,8 +55,8 @@ def init_user(user: UserModel, response: Response):
     Created DB session and then check if user already exists. 
     If not, creates new one.
 
-    :param user: instance of a user
-    :param response: some response
+    @param user: instance of a user
+    @param response: some response
     """
 
     session = db_session.create_session()
