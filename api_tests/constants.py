@@ -5,6 +5,7 @@ import os
 
 SERVER_URL = "http://217.28.228.66:8000/api/{}"
 IPFS_URL = "https://ipfs.infura.io/ipfs/{}"
+
 # Load private key
 with open(os.path.join("api_tests", "private.pem"), "rb") as f:
     PRIVATE_KEY = serialization.load_pem_private_key(
